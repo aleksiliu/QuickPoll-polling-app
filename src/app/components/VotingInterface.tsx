@@ -17,26 +17,37 @@ interface Poll {
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPoll = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const response = await fetch(`/api/poll/${pollId}`);
         if (response.ok) {
           const data = await response.json();
-          setPoll(data);
+          if (data && Array.isArray(data.options)) {
+            setPoll(data);
+          } else {
+            setError('Invalid poll data structure');
+          }
         } else {
-          console.error('Failed to fetch poll');
+          setError('Failed to fetch poll');
         }
       } catch (error) {
+        setError('Error fetching poll');
         console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchPoll();
   }, [pollId]);
 
   const handleVote = async () => {
-    if (!selectedOption) return;
+    if (!selectedOption || !poll) return;
     try {
       const response = await fetch(`/api/poll/${pollId}`, {
         method: 'POST',
@@ -44,21 +55,34 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
         body: JSON.stringify({ optionId: selectedOption }),
       });
       if (response.ok) {
-        // Refresh poll data after voting
-        const updatedPoll = await response.json();
-        setPoll(updatedPoll);
+        setPoll((currentPoll) => {
+          if (!currentPoll) return null;
+          return {
+            ...currentPoll,
+            options: currentPoll.options.map((option) => 
+              option.id === selectedOption
+                ? { ...option, voteCount: option.voteCount + 1 }
+                : option
+            ),
+          };
+        });
+        setSelectedOption(null);
       } else {
-        console.error('Failed to submit vote');
+        setError('Failed to submit vote');
       }
     } catch (error) {
+      setError('Error submitting vote');
       console.error('Error:', error);
     }
   };
 
-  if (!poll) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!poll || !poll.options) return <div>No poll data available</div>;
 
   return (
     <div className="space-y-4">
+      <h2 className="text-xl font-bold">{poll.question}</h2>
       {poll.options.map((option) => (
         <div key={option.id} className="flex items-center space-x-2">
           <input

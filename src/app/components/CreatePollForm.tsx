@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+function slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
+  }
+
 export default function CreatePollForm() {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
@@ -34,8 +41,8 @@ export default function CreatePollForm() {
         type="text"
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Enter your question"
-        className="w-full p-2 border rounded"
+        placeholder="Enter your poll name"
+        className="w-full p-2 border rounded text-black"
       />
       {options.map((option, index) => (
         <input
@@ -48,7 +55,7 @@ export default function CreatePollForm() {
             setOptions(newOptions);
           }}
           placeholder={`Option ${index + 1}`}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded text-black"
         />
       ))}
       <button
