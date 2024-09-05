@@ -1,4 +1,4 @@
-import { Poll, Option } from '../types';  // We'll create these types later
+import { Poll } from '../types';  // We'll create these types later
 
 // Function to create a new poll
 export async function createPoll(question: string, options: string[]): Promise<Poll> {

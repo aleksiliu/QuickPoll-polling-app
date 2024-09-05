@@ -4,12 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPoll } from '../lib/api';
 
-function slugify(text: string) {
-    return text
-      .toLowerCase()
-      .replace(/[^\w ]+/g, '')
-      .replace(/ +/g, '-');
-  }
 
 export default function CreatePollForm() {
   const [question, setQuestion] = useState('');
