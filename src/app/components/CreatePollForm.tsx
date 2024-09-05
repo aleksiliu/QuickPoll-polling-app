@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createPoll } from '../lib/api';
 
 function slugify(text: string) {
     return text
@@ -18,18 +19,9 @@ export default function CreatePollForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/poll', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, options: options.filter(opt => opt.trim() !== '') }),
-      });
-      if (response.ok) {
-        const poll = await response.json();
-        const encodedQuestion = encodeURIComponent(poll.question.replace(/\s+/g, '-').toLowerCase());
-        router.push(`/polls/${poll.id}/${encodedQuestion}`);
-      } else {
-        console.error('Failed to create poll');
-      }
+      const poll = await createPoll(question, options.filter(opt => opt.trim() !== ''));
+      const encodedQuestion = encodeURIComponent(poll.question.replace(/\s+/g, '-').toLowerCase());
+      router.push(`/polls/${poll.id}/${encodedQuestion}`);
     } catch (error) {
       console.error('Error:', error);
     }

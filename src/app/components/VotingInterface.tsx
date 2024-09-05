@@ -1,18 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface Option {
-  id: number;
-  text: string;
-  voteCount: number;
-}
-
-interface Poll {
-  id: number;
-  question: string;
-  options: Option[];
-}
+import { fetchPoll, submitVote } from '../lib/api';
+import { Poll, Option } from '../types';  
 
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
@@ -21,58 +11,38 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPoll = async () => {
-      setIsLoading(true);
-      setError(null);
+    async function loadPoll() {
       try {
-        const response = await fetch(`/api/poll/${pollId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data && Array.isArray(data.options)) {
-            setPoll(data);
-          } else {
-            setError('Invalid poll data structure');
-          }
-        } else {
-          setError('Failed to fetch poll');
-        }
+        const data = await fetchPoll(pollId);
+        setPoll(data);
       } catch (error) {
-        setError('Error fetching poll');
-        console.error('Error:', error);
+        setError('Failed to load poll');
       } finally {
         setIsLoading(false);
       }
-    };
-    fetchPoll();
+    }
+    loadPoll();
   }, [pollId]);
 
   const handleVote = async () => {
-    if (!selectedOption || !poll) return;
+    if (!selectedOption) return;
     try {
-      const response = await fetch(`/api/poll/${pollId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ optionId: selectedOption }),
+      await submitVote(pollId, selectedOption);
+     
+      setPoll((currentPoll) => {
+        if (!currentPoll) return null;
+        return {
+          ...currentPoll,
+          options: currentPoll.options.map((option) => 
+            option.id === selectedOption
+              ? { ...option, voteCount: option.voteCount + 1 }
+              : option
+          ),
+        };
       });
-      if (response.ok) {
-        setPoll((currentPoll) => {
-          if (!currentPoll) return null;
-          return {
-            ...currentPoll,
-            options: currentPoll.options.map((option) => 
-              option.id === selectedOption
-                ? { ...option, voteCount: option.voteCount + 1 }
-                : option
-            ),
-          };
-        });
-        setSelectedOption(null);
-      } else {
-        setError('Failed to submit vote');
-      }
+      setSelectedOption(null);
     } catch (error) {
-      setError('Error submitting vote');
-      console.error('Error:', error);
+      setError('Failed to submit vote');
     }
   };
 
@@ -83,7 +53,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">{poll.question}</h2>
-      {poll.options.map((option) => (
+      {poll.options.map((option: Option) => (
         <div key={option.id} className="flex items-center space-x-2">
           <input
             type="radio"
