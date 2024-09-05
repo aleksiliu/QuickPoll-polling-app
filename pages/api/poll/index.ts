@@ -30,9 +30,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if (req.method === 'GET') {
     try {
       const polls = await prisma.poll.findMany({
-        include: { options: true },
+        include: {
+          options: {
+            include: {
+              _count: {
+                select: { votes: true }
+              }
+            }
+          }
+        },
       });
-      res.status(200).json(polls);
+
+      const pollsWithVoteCounts = polls.map(poll => ({
+        ...poll,
+        options: poll.options.map(({ _count, ...option }) => ({
+          ...option,
+          voteCount: _count.votes
+        }))
+      }));
+
+      res.status(200).json(pollsWithVoteCounts);
     } catch (error) {
       console.error('Error fetching polls:', error);
       res.status(500).json({ error: 'Error fetching polls' });
