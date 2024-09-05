@@ -53,8 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       res.status(500).json({ error: 'Error fetching poll' });
     }
-  } else if (req.method === 'POST') {
-    // ... (rest of the POST logic remains the same)
+
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }
