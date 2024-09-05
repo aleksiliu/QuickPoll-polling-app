@@ -6,10 +6,13 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { question, options } = req.body;
-    
 
-    if (!question || !Array.isArray(options) || options.length === 0) {
-      return res.status(400).json({ error: 'Invalid input' });
+    if (!question || typeof question !== 'string' || question.trim() === '') {
+      return res.status(400).json({ error: 'Invalid question' });
+    }
+
+    if (!Array.isArray(options) || options.length < 2 || options.some(opt => typeof opt !== 'string' || opt.trim() === '')) {
+      return res.status(400).json({ error: 'Invalid options. Provide at least 2 non-empty options.' });
     }
 
     try {
@@ -17,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: {
           question,
           options: {
-            create: options.map((option: string) => ({ text: option })),
+            create: options.map((option: string) => ({ text: option.trim() })),
           },
         },
         include: { options: true },
@@ -25,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(poll);
     } catch (error) {
       console.error('Error creating poll:', error);
-      res.status(500).json({ error: 'Error creating poll' });
+      res.status(500).json({ error: 'Failed to create poll. Please try again.' });
     }
   } else if (req.method === 'GET') {
     try {
@@ -52,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(pollsWithVoteCounts);
     } catch (error) {
       console.error('Error fetching polls:', error);
-      res.status(500).json({ error: 'Error fetching polls' });
+      res.status(500).json({ error: 'Failed to fetch polls. Please try again.' });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
