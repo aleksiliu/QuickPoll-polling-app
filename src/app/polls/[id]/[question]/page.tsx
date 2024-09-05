@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import VotingInterface from '@/app/components/VotingInterface';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../lib/prisma';
 
 async function getPoll(id: string) {
   const pollId = parseInt(id);
