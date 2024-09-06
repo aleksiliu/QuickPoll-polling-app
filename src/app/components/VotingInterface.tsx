@@ -118,17 +118,18 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       </p>
       {sortedOptions.map((option: Option) => (
         <div key={option.id} className="mb-2">
-          <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
-            <input
-              type={poll.allowMultipleAnswers ? "checkbox" : "radio"}
-              id={`option-${option.id}`}
-              name="poll-option"
-              value={option.id}
-              checked={selectedOptions.includes(option.id)}
-              onChange={() => handleOptionChange(option.id)}
-              disabled={hasVoted}
-              className={poll.allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}
-            />
+          <div className="flex items-center space-x-2 py-2 hover:bg-gray-100 rounded transition-colors">
+            {!hasVoted && (
+              <input
+                type={poll.allowMultipleAnswers ? "checkbox" : "radio"}
+                id={`option-${option.id}`}
+                name="poll-option"
+                value={option.id}
+                checked={selectedOptions.includes(option.id)}
+                onChange={() => handleOptionChange(option.id)}
+                className={poll.allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}
+              />
+            )}
             <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
               {option.text}
             </label>
@@ -172,7 +173,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           disabled={selectedOptions.length === 0 || hasVoted}
           className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
         >
-          {hasVoted ? 'Voted' : 'Vote'}
+          {hasVoted ? 'Already voted' : 'Vote'}
         </button>
         {hasVoted && (
           <button
