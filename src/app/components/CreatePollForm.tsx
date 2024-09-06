@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createPoll } from '../services/api';
 import Image from 'next/image';
 import LoadingSpinner from './LoadingSpinner';
+import { slugify } from '../utils/stringUtils';
 
 export default function CreatePollForm() {
   const [question, setQuestion] = useState('');
@@ -33,16 +34,16 @@ export default function CreatePollForm() {
       setIsLoading(false);
       return;
     }
-
+  
     try {
-      const poll = await createPoll(question, validOptions);
-      const encodedQuestion = encodeURIComponent(poll.question.replace(/\s+/g, '-').toLowerCase());
-
+      const poll = await createPoll(trimmedQuestion, validOptions);
+      const slugifiedQuestion = slugify(poll.question);
+  
       if (headerImage) {
         localStorage.setItem(`pollImage_${poll.id}`, headerImage);
       }
-
-      router.push(`/polls/${poll.id}/${encodedQuestion}`);
+  
+      router.push(`/polls/${poll.id}/${slugifiedQuestion}`);
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to create poll. Please try again.');
