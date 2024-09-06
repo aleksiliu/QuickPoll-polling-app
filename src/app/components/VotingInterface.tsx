@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchPoll, submitVote } from '../lib/api';
+import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';  
 
 export default function VotingInterface({ pollId }: { pollId: string }) {

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { fetchAllPolls } from '../lib/api';
+import { fetchAllPolls } from '../services/api';
 import { Poll } from '../types';
 
 export default async function PollsPage() {
