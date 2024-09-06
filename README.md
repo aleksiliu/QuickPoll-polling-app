@@ -30,7 +30,7 @@ The following API routes are available:
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/quickpoll.git
+   git clone https://github.com/aleksiliu/QuickPoll-polling-app.git
    cd quickpoll
    ```
 
