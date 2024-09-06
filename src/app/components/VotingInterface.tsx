@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';
 import Image from 'next/image';
@@ -44,6 +44,13 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
     return [...poll.options].sort((a, b) => b.voteCount - a.voteCount);
   }, [poll]);
 
+  const winningOption = useMemo(() => {
+    if (sortedOptions.length === 0) return null;
+    const maxVotes = sortedOptions[0].voteCount;
+    const topOptions = sortedOptions.filter(option => option.voteCount === maxVotes);
+    return topOptions.length === 1 ? topOptions[0] : null;
+  }, [sortedOptions]);
+
   useEffect(() => {
     loadPoll();
     const storedImage = localStorage.getItem(`pollImage_${pollId}`);
@@ -54,11 +61,12 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
 
   const handleOptionChange = (optionId: number) => {
     if (allowMultipleAnswers) {
-      setSelectedOptions(prev => 
-        prev.includes(optionId)
+      setSelectedOptions(prev => {
+        const newSelection = prev.includes(optionId)
           ? prev.filter(id => id !== optionId)
-          : [...prev, optionId]
-      );
+          : [...prev, optionId];
+        return newSelection;
+      });
     } else {
       setSelectedOptions([optionId]);
     }
@@ -114,28 +122,39 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       )}
       <h2 className="text-2xl font-bold text-gray-800 mb-2">{poll.question}</h2>
       <p className="text-sm text-gray-600 mb-4">
-        {poll.allowMultipleAnswers ? "You can select multiple options" : "Select one option"}
+        {allowMultipleAnswers ? "You can select multiple options" : "Select one option"}
       </p>
+   
       {sortedOptions.map((option: Option) => (
         <div key={option.id} className="mb-2">
           <div className="flex items-center space-x-2 py-2 hover:bg-gray-100 rounded transition-colors">
             {!hasVoted && (
               <input
-                type={poll.allowMultipleAnswers ? "checkbox" : "radio"}
+                type={allowMultipleAnswers ? "checkbox" : "radio"}
                 id={`option-${option.id}`}
                 name="poll-option"
                 value={option.id}
                 checked={selectedOptions.includes(option.id)}
                 onChange={() => handleOptionChange(option.id)}
-                className={poll.allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}
+                className={`flex-shrink-0 ${allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}`}
               />
             )}
-            <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
-              {option.text}
+            <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow flex items-center break-words overflow-wrap-anywhere pr-2">
+              <span>{option.text}</span>
+              {hasVoted && winningOption && winningOption.id === option.id && (
+                <span className="ml-2 px-2 py-1 text-xs font-bold rounded bg-green-200 text-green-800">
+                  Currently Winning
+                </span>
+              )}
             </label>
-            <span className="font-semibold text-gray-600">
-              {option.voteCount} votes ({totalVotes > 0 ? ((option.voteCount / totalVotes) * 100).toFixed(1) : 0}%)
-            </span>
+            <div className="flex flex-col items-end ml-2">
+              <span className="font-semibold text-gray-600 text-sm">
+                {option.voteCount} votes
+              </span>
+              <span className="text-gray-500 text-xs">
+                ({totalVotes > 0 ? ((option.voteCount / totalVotes) * 100).toFixed(1) : 0}%)
+              </span>
+            </div>
           </div>
           <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div 
@@ -173,7 +192,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           disabled={selectedOptions.length === 0 || hasVoted}
           className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
         >
-          {hasVoted ? 'Already voted' : 'Vote'}
+          {hasVoted ? 'Voted' : 'Vote'}
         </button>
         {hasVoted && (
           <button
