@@ -6,7 +6,6 @@ QuickPoll is a modern, user-friendly web application that allows users to create
 
 - Create polls with multiple options
 - Vote on existing polls
-- Real-time vote counting
 - Responsive design for mobile and desktop
 
 ## Technologies Used

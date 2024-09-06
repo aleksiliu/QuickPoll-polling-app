@@ -110,7 +110,7 @@ export default function CreatePollForm() {
               alt="Poll header"
               width={400}
               height={200}
-              className="w-full h-40 object-cover rounded-md"
+              className="w-full h-40 object-cover rounded-md object-center"
             />
             <button
               type="button"
