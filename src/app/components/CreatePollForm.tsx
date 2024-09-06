@@ -36,6 +36,11 @@ export default function CreatePollForm() {
     try {
       const poll = await createPoll(question, validOptions);
       const encodedQuestion = encodeURIComponent(poll.question.replace(/\s+/g, '-').toLowerCase());
+
+      if (headerImage) {
+        localStorage.setItem(`pollImage_${poll.id}`, headerImage);
+      }
+
       router.push(`/polls/${poll.id}/${encodedQuestion}`);
     } catch (error) {
       console.error('Error:', error);

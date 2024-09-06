@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';
+import Image from 'next/image';
 
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
@@ -10,6 +11,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [headerImage, setHeaderImage] = useState<string | null>(null);
 
   const loadPoll = useCallback(async () => {
     setIsLoading(true);
@@ -27,7 +29,11 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
 
   useEffect(() => {
     loadPoll();
-  }, [loadPoll]);
+    const storedImage = localStorage.getItem(`pollImage_${pollId}`);
+    if (storedImage) {
+      setHeaderImage(storedImage);
+    }
+  }, [loadPoll, pollId]);
 
   const handleVote = async () => {
     if (!selectedOption) return;
@@ -55,27 +61,51 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   if (error) return <div className="text-red-500 p-4">Error: {error}</div>;
   if (!poll || !poll.options) return <div className="text-center p-4">No poll data available</div>;
 
+  const totalVotes = poll.options.reduce((sum, option) => sum + option.voteCount, 0);
+
   return (
     <div className="mt-8 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
-      <h2 className="text-2xl font-bold text-gray-800">{poll.question}</h2>
-      {poll.options.map((option: Option) => (
-        <div key={option.id} className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
-          <input
-            type="radio"
-            id={`option-${option.id}`}
-            name="poll-option"
-            value={option.id}
-            checked={selectedOption === option.id}
-            onChange={() => setSelectedOption(option.id)}
-            disabled={hasVoted}
-            className="form-radio text-blue-600"
+      {headerImage && (
+        <div className="mb-4">
+          <Image
+            src={headerImage}
+            alt="Poll header"
+            width={400}
+            height={200}
+            className="w-full h-40 object-cover rounded-md"
           />
-          <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
-            {option.text} <span className="font-semibold ml-1">({option.voteCount} votes)</span>
-          </label>
+        </div>
+      )}
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">{poll.question}</h2>
+      {poll.options.map((option: Option) => (
+        <div key={option.id} className="mb-2">
+          <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
+            <input
+              type="radio"
+              id={`option-${option.id}`}
+              name="poll-option"
+              value={option.id}
+              checked={selectedOption === option.id}
+              onChange={() => setSelectedOption(option.id)}
+              disabled={hasVoted}
+              className="form-radio text-blue-600"
+            />
+            <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
+              {option.text}
+            </label>
+            <span className="font-semibold text-gray-600">
+              {option.voteCount} votes ({totalVotes > 0 ? ((option.voteCount / totalVotes) * 100).toFixed(1) : 0}%)
+            </span>
+          </div>
+          <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-500"
+              style={{ width: `${totalVotes > 0 ? (option.voteCount / totalVotes) * 100 : 0}%` }}
+            ></div>
+          </div>
         </div>
       ))}
-      <div className="flex space-x-2">
+      <div className="mt-4 flex space-x-2">
         <button
           onClick={handleVote}
           disabled={!selectedOption || hasVoted}
@@ -92,6 +122,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           </button>
         )}
       </div>
+      <p className="mt-2 text-center text-gray-600">Total votes: {totalVotes}</p>
     </div>
   );
 }
