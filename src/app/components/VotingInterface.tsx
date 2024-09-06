@@ -129,7 +129,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           </div>
           {option.votes && option.votes.length > 0 && (
             <div className="mt-1">
-              <p className="text-xs text-gray-600">Voters: {option.votes.map(vote => vote.voterName).join(', ')}</p>
+              <p className="text-xs text-gray-500">Voters: {option.votes.map(vote => vote.voterName).join(', ')}</p>
             </div>
           )}
         </div>

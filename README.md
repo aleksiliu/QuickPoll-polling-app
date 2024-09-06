@@ -16,6 +16,15 @@ QuickPoll is a modern, user-friendly web application that allows users to create
 - **Prisma**: ORM for database management
 - **SQLite**: Lightweight database for storing polls and votes
 
+## API Routes
+
+The following API routes are available:
+
+- `POST /api/poll`: Create a new poll
+- `GET /api/poll`: Fetch all polls
+- `GET /api/poll/[id]`: Fetch a specific poll
+- `POST /api/poll/[id]`: Submit a vote for a specific poll
+
 ## Installation Guide
 
 1. Clone the repository:
