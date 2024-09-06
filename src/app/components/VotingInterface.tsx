@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';
 import Image from 'next/image';
@@ -36,6 +36,12 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       setIsLoading(false);
     }
   }, [pollId]);
+
+
+  const sortedOptions = useMemo(() => {
+    if (!poll) return [];
+    return [...poll.options].sort((a, b) => b.voteCount - a.voteCount);
+  }, [poll]);
 
   useEffect(() => {
     loadPoll();
@@ -78,6 +84,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
 
   const totalVotes = poll.options.reduce((sum, option) => sum + option.voteCount, 0);
 
+
   return (
     <div className="mt-8 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
       {headerImage && (
@@ -92,7 +99,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
         </div>
       )}
       <h2 className="text-2xl font-bold text-gray-800 mb-2">{poll.question}</h2>
-      {poll.options.map((option: Option) => (
+      {sortedOptions.map((option: Option) => (
         <div key={option.id} className="mb-2">
           <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
             <input
