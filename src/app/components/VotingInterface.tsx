@@ -108,7 +108,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const totalVotes = poll.options.reduce((sum, option) => sum + option.voteCount, 0);
 
   return (
-    <div className="mt-8 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
+    <div className="p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
       {headerImage && (
         <div className="mb-4">
           <Image
