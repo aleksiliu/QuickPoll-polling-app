@@ -74,13 +74,19 @@ export default function CreatePollForm() {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setHeaderImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+        try {
+            localStorage.clear(); 
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setHeaderImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } catch (e) {
+            console.error('Error reading file:', e);
+        }
     }
   };
+
 
   const removeImage = () => {
     setHeaderImage(null);

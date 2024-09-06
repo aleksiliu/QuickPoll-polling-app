@@ -14,7 +14,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [hasVoted, setHasVoted] = useState(false);
   const [headerImage, setHeaderImage] = useState<string | null>(null);
   const [animate, setAnimate] = useState(false);
-
+  const [voterName, setVoterName] = useState('');
 
   useEffect(() => {
     if (poll) {
@@ -22,7 +22,6 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       return () => clearTimeout(timer);
     }
   }, [poll]);
-
 
   const loadPoll = useCallback(async () => {
     setIsLoading(true);
@@ -49,7 +48,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const handleVote = async () => {
     if (!selectedOption) return;
     try {
-      await submitVote(pollId, selectedOption);
+      await submitVote(pollId, selectedOption, voterName || null);
       setHasVoted(true);
       setPoll((currentPoll) => {
         if (!currentPoll) return null;
@@ -57,12 +56,17 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           ...currentPoll,
           options: currentPoll.options.map((option) => 
             option.id === selectedOption
-              ? { ...option, voteCount: option.voteCount + 1 }
+              ? { 
+                  ...option, 
+                  voteCount: option.voteCount + 1, 
+                  votes: [...option.votes, { id: Date.now(), voterName: voterName || 'Anonymous' }] 
+                }
               : option
           ),
         };
       });
       setSelectedOption(null);
+      setVoterName('');
     } catch (error) {
       setError('Failed to submit vote');
     }
@@ -87,7 +91,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           />
         </div>
       )}
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">{poll.question}</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">{poll.question}</h2>
       {poll.options.map((option: Option) => (
         <div key={option.id} className="mb-2">
           <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
@@ -109,23 +113,43 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
             </span>
           </div>
           <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div 
+            <div 
               className="h-full bg-blue-500 transition-all duration-1000 ease-out"
               style={{ 
                 width: animate ? `${(option.voteCount / totalVotes) * 100}%` : '0%'
               }}
             ></div>
           </div>
+          {option.votes && option.votes.length > 0 && (
+            <div className="mt-1">
+              <p className="text-xs text-gray-600">Voters: {option.votes.map(vote => vote.voterName).join(', ')}</p>
+            </div>
+          )}
         </div>
       ))}
+        {!hasVoted && (
+          <>
+            <label htmlFor="voterName" className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Your Name (optional)
+            </label>
+            <input
+              type="text"
+              id="voterName"
+              value={voterName}
+              onChange={(e) => setVoterName(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your name"
+            />
+          </>
+        )}
       <div className="mt-4 flex space-x-2">
-        <button
-          onClick={handleVote}
-          disabled={!selectedOption || hasVoted}
-          className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
-        >
-          {hasVoted ? 'Voted' : 'Vote'}
-        </button>
+      <button
+  onClick={handleVote}
+  disabled={!selectedOption || hasVoted}
+  className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
+>
+  {hasVoted ? 'Voted' : 'Vote'}
+</button>
         {hasVoted && (
           <button
             onClick={loadPoll}

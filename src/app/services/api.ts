@@ -19,11 +19,11 @@ export async function fetchPoll(id: string): Promise<Poll> {
 }
 
 // Function to submit a vote
-export async function submitVote(pollId: string, optionId: number): Promise<void> {
+export async function submitVote(pollId: string, optionId: number, voterName: string | null): Promise<void> {
   const response = await fetch(`/api/poll/${pollId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ optionId }),
+    body: JSON.stringify({ optionId, voterName }),
   });
   if (!response.ok) throw new Error('Failed to submit vote');
 }

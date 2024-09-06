@@ -2,6 +2,7 @@ export interface Option {
     id: number;
     text: string;
     voteCount: number;
+    votes: Vote[];
   }
   
   export interface Poll {
@@ -12,8 +13,7 @@ export interface Option {
   
   export interface Vote {
     id: number;
-    optionId: number;
-    pollId: number;
+    voterName: string;
   }
   
   export interface PollWithVoteCounts extends Poll {
