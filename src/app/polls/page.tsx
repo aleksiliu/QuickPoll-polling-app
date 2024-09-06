@@ -1,52 +1,33 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchAllPolls } from '../services/api';
-import { Poll } from '../types';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { prisma } from '../lib/prisma';
+import { Poll, Option } from '../types';
 import { slugify } from '../utils/stringUtils';
 
-export default function PollsPage() {
-  const [polls, setPolls] = useState<Poll[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadPolls() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const fetchedPolls = await fetchAllPolls();
-        setPolls(fetchedPolls);
-      } catch (err) {
-        console.error('Failed to fetch polls:', err);
-        setError('Failed to load polls. Please try again later.');
-      } finally {
-        setIsLoading(false);
+async function fetchAllPolls(): Promise<Poll[]> {
+  const polls = await prisma.poll.findMany({
+    include: {
+      options: {
+        include: {
+          _count: {
+            select: { votes: true }
+          }
+        }
       }
-    }
+    },
+  });
 
-    loadPolls();
-  }, []);
+  return polls.map((poll): Poll => ({
+    ...poll,
+    options: poll.options.map(({ _count, ...option }): Option => ({
+      ...option,
+      voteCount: _count.votes,
+      votes: [] 
+    }))
+  }));
+}
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6">All Polls</h1>
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6">All Polls</h1>
-        <p className="text-red-500 bg-red-100 p-4 rounded-md">{error}</p>
-      </div>
-    );
-  }
+export default async function PollsPage() {
+  const polls = await fetchAllPolls();
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
