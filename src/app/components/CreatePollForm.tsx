@@ -183,7 +183,7 @@ export default function CreatePollForm() {
           type="button"
           onClick={addOption}
           disabled={options.length >= 10}
-          className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-300"
+          className="bg-white text-gray-700 border border-gray-300 p-2 rounded-md hover:bg-gray-100 transition-colors disabled:bg-gray-100 disabled:text-gray-400"
         >
           Add Option
         </button>
