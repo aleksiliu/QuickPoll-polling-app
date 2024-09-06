@@ -8,7 +8,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -51,17 +51,27 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
     }
   }, [loadPoll, pollId]);
 
+  const handleOptionChange = (optionId: number) => {
+    setSelectedOptions(prev => 
+      prev.includes(optionId)
+        ? prev.filter(id => id !== optionId)
+        : [...prev, optionId]
+    );
+  };
+
   const handleVote = async () => {
-    if (!selectedOption) return;
+    if (selectedOptions.length === 0) return;
     try {
-      await submitVote(pollId, selectedOption, voterName || null);
+      for (const optionId of selectedOptions) {
+        await submitVote(pollId, optionId, voterName || null);
+      }
       setHasVoted(true);
       setPoll((currentPoll) => {
         if (!currentPoll) return null;
         return {
           ...currentPoll,
           options: currentPoll.options.map((option) => 
-            option.id === selectedOption
+            selectedOptions.includes(option.id)
               ? { 
                   ...option, 
                   voteCount: option.voteCount + 1, 
@@ -71,7 +81,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           ),
         };
       });
-      setSelectedOption(null);
+      setSelectedOptions([]);
       setVoterName('');
     } catch (error) {
       setError('Failed to submit vote');
@@ -103,14 +113,14 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
         <div key={option.id} className="mb-2">
           <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
             <input
-              type="radio"
+              type="checkbox"
               id={`option-${option.id}`}
               name="poll-option"
               value={option.id}
-              checked={selectedOption === option.id}
-              onChange={() => setSelectedOption(option.id)}
+              checked={selectedOptions.includes(option.id)}
+              onChange={() => handleOptionChange(option.id)}
               disabled={hasVoted}
-              className="form-radio text-blue-600"
+              className="form-checkbox text-blue-600"
             />
             <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
               {option.text}
@@ -152,7 +162,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       <div className="mt-4 flex space-x-2">
       <button
   onClick={handleVote}
-  disabled={!selectedOption || hasVoted}
+  disabled={selectedOptions.length === 0 || hasVoted}
   className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
 >
   {hasVoted ? 'Voted' : 'Vote'}

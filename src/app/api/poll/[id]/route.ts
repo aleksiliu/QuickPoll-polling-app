@@ -17,7 +17,6 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid option ID' }, { status: 400 });
   }
 
-
   try {
     const vote = await prisma.vote.create({
       data: {
@@ -28,12 +27,8 @@ export async function POST(
     });
     return NextResponse.json(vote);
   } catch (error) {
-    if ((error as { code?: string }).code === 'P2002') {
-      return NextResponse.json({ error: 'You have already voted for this option in this poll.' }, { status: 400 });
-    } else {
-      console.error('Error submitting vote:', error);
-      return NextResponse.json({ error: 'Failed to submit vote. Please try again.' }, { status: 500 });
-    }
+    console.error('Error submitting vote:', error);
+    return NextResponse.json({ error: 'Failed to submit vote. Please try again.' }, { status: 500 });
   }
 }
 
