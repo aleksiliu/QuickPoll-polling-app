@@ -3,6 +3,7 @@ import { useState, KeyboardEvent, useRef, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPoll } from '../services/api';
 import Image from 'next/image';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function CreatePollForm() {
   const [question, setQuestion] = useState('');
@@ -91,7 +92,7 @@ export default function CreatePollForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
-            <div className="mb-4">
+        <div className="mb-4">
         <label htmlFor="headerImage" className="block text-sm font-medium text-gray-700 mb-1">
           Header Image (optional)
         </label>
@@ -182,10 +183,11 @@ export default function CreatePollForm() {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-300"
+          className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-300 flex items-center justify-center"
         >
-          {isLoading ? 'Creating...' : 'Create Poll'}
+        {isLoading ? <LoadingSpinner /> : 'Create Poll'}
         </button>
+
       </div>
       {error && <p className="text-red-500 text-center">{error}</p>}
     </form>

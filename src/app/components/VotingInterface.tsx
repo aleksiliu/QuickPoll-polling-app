@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';
 import Image from 'next/image';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
@@ -12,6 +13,16 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [headerImage, setHeaderImage] = useState<string | null>(null);
+  const [animate, setAnimate] = useState(false);
+
+
+  useEffect(() => {
+    if (poll) {
+      const timer = setTimeout(() => setAnimate(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [poll]);
+
 
   const loadPoll = useCallback(async () => {
     setIsLoading(true);
@@ -57,7 +68,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
     }
   };
 
-  if (isLoading) return <div className="text-center p-4">Loading...</div>;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500 p-4">Error: {error}</div>;
   if (!poll || !poll.options) return <div className="text-center p-4">No poll data available</div>;
 
@@ -98,9 +109,11 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
             </span>
           </div>
           <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-500"
-              style={{ width: `${totalVotes > 0 ? (option.voteCount / totalVotes) * 100 : 0}%` }}
+          <div 
+              className="h-full bg-blue-500 transition-all duration-1000 ease-out"
+              style={{ 
+                width: animate ? `${(option.voteCount / totalVotes) * 100}%` : '0%'
+              }}
             ></div>
           </div>
         </div>
