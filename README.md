@@ -1,4 +1,4 @@
-# QuickPoll - Create and Share Polls Instantly
+# QuickPoll 
 
 QuickPoll is a modern, user-friendly web application that allows users to create, share, and participate in polls with ease. Get instant results and insights from your audience.
 
