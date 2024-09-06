@@ -12,6 +12,7 @@ export default function CreatePollForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [headerImage, setHeaderImage] = useState<string | null>(null);
+  const [allowMultipleAnswers, setAllowMultipleAnswers] = useState(false);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +37,7 @@ export default function CreatePollForm() {
     }
   
     try {
-      const poll = await createPoll(trimmedQuestion, validOptions);
+      const poll = await createPoll(trimmedQuestion, validOptions, allowMultipleAnswers);
       const slugifiedQuestion = slugify(poll.question);
   
       if (headerImage) {
@@ -178,6 +179,18 @@ export default function CreatePollForm() {
           )}
         </div>
       ))}
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="allowMultipleAnswers"
+          checked={allowMultipleAnswers}
+          onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
+          className="form-checkbox text-blue-600"
+        />
+        <label htmlFor="allowMultipleAnswers" className="text-sm text-gray-700">
+          Allow multiple answers (voters can select more than one option)
+        </label>
+      </div>
       <div className="flex justify-between">
         <button
           type="button"

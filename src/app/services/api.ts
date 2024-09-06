@@ -1,11 +1,11 @@
 import { Poll } from '../types';
 
 // Function to create a new poll
-export async function createPoll(question: string, options: string[]): Promise<Poll> {
+export async function createPoll(question: string, options: string[], allowMultipleAnswers: boolean): Promise<Poll> {
   const response = await fetch(`/api/poll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question, options }),
+    body: JSON.stringify({ question, options, allowMultipleAnswers }),
   });
   if (!response.ok) throw new Error('Failed to create poll');
   return response.json();

@@ -9,6 +9,7 @@ export interface Option {
     id: number;
     question: string;
     options: Option[];
+    allowMultipleAnswers: boolean;  // Add this line
   }
   
   export interface Vote {

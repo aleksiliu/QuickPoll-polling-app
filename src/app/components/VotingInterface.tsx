@@ -15,6 +15,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [headerImage, setHeaderImage] = useState<string | null>(null);
   const [animate, setAnimate] = useState(false);
   const [voterName, setVoterName] = useState('');
+  const [allowMultipleAnswers, setAllowMultipleAnswers] = useState(false);
 
   useEffect(() => {
     if (poll) {
@@ -28,6 +29,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
     try {
       const data = await fetchPoll(pollId);
       setPoll(data);
+      setAllowMultipleAnswers(data.allowMultipleAnswers);
       setError(null);
     } catch (error) {
       setError('Failed to load poll');
@@ -36,7 +38,6 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       setIsLoading(false);
     }
   }, [pollId]);
-
 
   const sortedOptions = useMemo(() => {
     if (!poll) return [];
@@ -52,11 +53,15 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   }, [loadPoll, pollId]);
 
   const handleOptionChange = (optionId: number) => {
-    setSelectedOptions(prev => 
-      prev.includes(optionId)
-        ? prev.filter(id => id !== optionId)
-        : [...prev, optionId]
-    );
+    if (allowMultipleAnswers) {
+      setSelectedOptions(prev => 
+        prev.includes(optionId)
+          ? prev.filter(id => id !== optionId)
+          : [...prev, optionId]
+      );
+    } else {
+      setSelectedOptions([optionId]);
+    }
   };
 
   const handleVote = async () => {
@@ -94,7 +99,6 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
 
   const totalVotes = poll.options.reduce((sum, option) => sum + option.voteCount, 0);
 
-
   return (
     <div className="mt-8 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
       {headerImage && (
@@ -109,18 +113,21 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
         </div>
       )}
       <h2 className="text-2xl font-bold text-gray-800 mb-2">{poll.question}</h2>
+      <p className="text-sm text-gray-600 mb-4">
+        {poll.allowMultipleAnswers ? "You can select multiple options" : "Select one option"}
+      </p>
       {sortedOptions.map((option: Option) => (
         <div key={option.id} className="mb-2">
           <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded transition-colors">
             <input
-              type="checkbox"
+              type={poll.allowMultipleAnswers ? "checkbox" : "radio"}
               id={`option-${option.id}`}
               name="poll-option"
               value={option.id}
               checked={selectedOptions.includes(option.id)}
               onChange={() => handleOptionChange(option.id)}
               disabled={hasVoted}
-              className="form-checkbox text-blue-600"
+              className={poll.allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}
             />
             <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow">
               {option.text}
@@ -144,29 +151,29 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
           )}
         </div>
       ))}
-        {!hasVoted && (
-          <>
-            <label htmlFor="voterName" className="block text-sm font-medium text-gray-700 mb-1 mt-4">
-              Your Name (optional)
-            </label>
-            <input
-              type="text"
-              id="voterName"
-              value={voterName}
-              onChange={(e) => setVoterName(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your name"
-            />
-          </>
-        )}
+      {!hasVoted && (
+        <>
+          <label htmlFor="voterName" className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+            Your Name (optional)
+          </label>
+          <input
+            type="text"
+            id="voterName"
+            value={voterName}
+            onChange={(e) => setVoterName(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your name"
+          />
+        </>
+      )}
       <div className="mt-4 flex space-x-2">
-      <button
-  onClick={handleVote}
-  disabled={selectedOptions.length === 0 || hasVoted}
-  className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
->
-  {hasVoted ? 'Voted' : 'Vote'}
-</button>
+        <button
+          onClick={handleVote}
+          disabled={selectedOptions.length === 0 || hasVoted}
+          className="flex-grow bg-blue-500 text-white p-2 rounded disabled:bg-gray-300 hover:bg-blue-600 transition-colors"
+        >
+          {hasVoted ? 'Voted' : 'Vote'}
+        </button>
         {hasVoted && (
           <button
             onClick={loadPoll}
