@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import VotingInterface from '@/app/components/VotingInterface';
 import { prisma } from '../../../lib/prisma';
+import { slugify } from '../../../utils/stringUtils';
 
 async function getPoll(id: string) {
   const pollId = parseInt(id);
@@ -11,13 +12,6 @@ async function getPoll(id: string) {
     where: { id: pollId },
     include: { options: true },
   });
-}
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
 }
 
 export default async function PollPage({ params }: { params: { id: string, question: string } }) {

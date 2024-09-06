@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { fetchAllPolls } from '../services/api';
 import { Poll } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { slugify } from '../utils/stringUtils';
 
 export default function PollsPage() {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -53,8 +54,8 @@ export default function PollsPage() {
       <ul className="space-y-4">
         {polls.map((poll) => (
           <li key={poll.id} className="bg-white shadow-md rounded-lg hover:shadow-lg transition-shadow duration-300">
-            <Link 
-              href={`/polls/${poll.id}/${encodeURIComponent(poll.question.replace(/\s+/g, '-').toLowerCase())}`}
+          <Link 
+              href={`/polls/${poll.id}/${slugify(poll.question)}`}
               className="block p-6"
             >
               <h2 className="text-xl font-semibold text-gray-800 mb-2 hover:text-blue-600 transition-colors duration-300">
