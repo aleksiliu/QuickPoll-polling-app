@@ -10,6 +10,20 @@ QuickPoll is a modern, user-friendly web application that allows users to create
 - Add optional header images to polls
 - Responsive design for mobile and desktop
 
+## Screenshots
+
+![Create Poll Form](./screenshot1.png)
+_Create Poll Form: Users can easily create new polls with multiple options and optional header images._
+
+![Create Poll Form](./screenshot2.png)
+_User can add more options to the poll or delete them_
+
+![Voting Page](./screenshot3.png)
+_Voting Page: Users can vote on existing polls and see the results in real-time._
+
+![Results](./screenshot4.png)
+_Results Page: Detailed view of poll results with real-time updates and visual representations._
+
 ## Technologies Used
 
 - **Next.js**: React framework for server-side rendering and routing
