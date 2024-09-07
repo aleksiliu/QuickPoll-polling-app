@@ -7,13 +7,13 @@ QuickPoll is a modern, user-friendly web application that allows users to create
 - Create polls with multiple options
 - Vote on existing polls
 - Support for multiple choice polls (select more than one option)
-- Add optional header images to polls
+- Add optional header image to polls
 - Responsive design for mobile and desktop
 
 ## Screenshots
 
 ![Create Poll Form](./screenshot1.png)
-_Create Poll Form: Users can easily create new polls with multiple options and optional header images._
+_Create Poll Form: Users can easily create new polls with multiple options and optional header image._
 
 ![Create Poll Form](./screenshot2.png)
 _User can add more options to the poll or delete them_
