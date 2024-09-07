@@ -38,7 +38,7 @@ export function VotingOption({
         )}
         <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow flex items-center break-words overflow-wrap-anywhere pr-2">
           <span>{option.text}</span>
-          {hasVoted && isWinning && (
+          {hasVoted && isWinning && totalVotes >= 3 && (
             <span className="ml-2 px-2 py-1 text-xs font-bold rounded bg-green-200 text-green-800">
               MOST VOTES
             </span>
