@@ -5,6 +5,7 @@ import { fetchPoll, submitVote } from '../services/api';
 import { Poll, Option } from '../types';
 import Image from 'next/image';
 import LoadingSpinner from './LoadingSpinner';
+import { VotingOption } from './VotingOption';
 
 export default function VotingInterface({ pollId }: { pollId: string }) {
   const [poll, setPoll] = useState<Poll | null>(null);
@@ -126,50 +127,17 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
       </p>
    
       {sortedOptions.map((option: Option) => (
-        <div key={option.id} className="mb-2">
-          <div className="flex items-center space-x-2 py-2 hover:bg-gray-100 rounded transition-colors">
-            {!hasVoted && (
-              <input
-                type={allowMultipleAnswers ? "checkbox" : "radio"}
-                id={`option-${option.id}`}
-                name="poll-option"
-                value={option.id}
-                checked={selectedOptions.includes(option.id)}
-                onChange={() => handleOptionChange(option.id)}
-                className={`flex-shrink-0 ${allowMultipleAnswers ? "form-checkbox text-blue-600" : "form-radio text-blue-600"}`}
-              />
-            )}
-            <label htmlFor={`option-${option.id}`} className="text-gray-700 flex-grow flex items-center break-words overflow-wrap-anywhere pr-2">
-              <span>{option.text}</span>
-              {hasVoted && winningOption && winningOption.id === option.id && (
-                <span className="ml-2 px-2 py-1 text-xs font-bold rounded bg-green-200 text-green-800">
-                  Currently Winning
-                </span>
-              )}
-            </label>
-            <div className="flex flex-col items-end ml-2">
-              <span className="font-semibold text-gray-600 text-sm">
-                {option.voteCount} votes
-              </span>
-              <span className="text-gray-500 text-xs">
-                ({totalVotes > 0 ? ((option.voteCount / totalVotes) * 100).toFixed(1) : 0}%)
-              </span>
-            </div>
-          </div>
-          <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 transition-all duration-1000 ease-out"
-              style={{ 
-                width: animate ? `${(option.voteCount / totalVotes) * 100}%` : '0%'
-              }}
-            ></div>
-          </div>
-          {option.votes && option.votes.length > 0 && (
-            <div className="mt-1">
-              <p className="text-xs text-gray-500">Voters: {option.votes.map(vote => vote.voterName).join(', ')}</p>
-            </div>
-          )}
-        </div>
+       <VotingOption
+       key={option.id}
+       option={option}
+       hasVoted={hasVoted}
+       isWinning={winningOption?.id === option.id}
+       isSelected={selectedOptions.includes(option.id)}
+       totalVotes={totalVotes}
+       animate={animate}
+       allowMultipleAnswers={allowMultipleAnswers}
+       onOptionChange={handleOptionChange}
+     />
       ))}
       {!hasVoted && (
         <>
