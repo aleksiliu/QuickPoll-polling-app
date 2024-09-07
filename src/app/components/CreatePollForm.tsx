@@ -46,7 +46,7 @@ export default function CreatePollForm() {
   
       router.push(`/polls/${poll.id}/${slugifiedQuestion}`);
     } catch (error) {
-      console.error('Error:', error);
+    
       setError('Failed to create poll. Please try again.');
     } finally {
       setIsLoading(false);

@@ -27,7 +27,6 @@ export async function POST(
     });
     return NextResponse.json(vote);
   } catch (error) {
-    console.error('Error submitting vote:', error);
     return NextResponse.json({ error: 'Failed to submit vote. Please try again.' }, { status: 500 });
   }
 }
@@ -79,7 +78,6 @@ export async function GET(
 
     return NextResponse.json(pollWithVoteCounts);
   } catch (error) {
-    console.error('Error fetching poll:', error);
     return NextResponse.json({ error: 'Failed to fetch poll. Please try again.' }, { status: 500 });
   }
 }

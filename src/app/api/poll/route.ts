@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(poll);
   } catch (error) {
-    console.error('Error creating poll:', error);
     return NextResponse.json({ error: 'Failed to create poll. Please try again.' }, { status: 500 });
   }
 }
@@ -54,7 +53,6 @@ export async function GET() {
 
     return NextResponse.json(pollsWithVoteCounts);
   } catch (error) {
-    console.error('Error fetching polls:', error);
     return NextResponse.json({ error: 'Failed to fetch polls. Please try again.' }, { status: 500 });
   }
 }
