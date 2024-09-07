@@ -1,7 +1,8 @@
 -- CreateTable
 CREATE TABLE "Poll" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "question" TEXT NOT NULL
+    "question" TEXT NOT NULL,
+    "allowMultipleAnswers" BOOLEAN NOT NULL DEFAULT false
 );
 
 -- CreateTable
@@ -17,6 +18,7 @@ CREATE TABLE "Vote" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "optionId" INTEGER NOT NULL,
     "pollId" INTEGER NOT NULL,
+    "voterName" TEXT,
     CONSTRAINT "Vote_optionId_fkey" FOREIGN KEY ("optionId") REFERENCES "Option" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Vote_pollId_fkey" FOREIGN KEY ("pollId") REFERENCES "Poll" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
