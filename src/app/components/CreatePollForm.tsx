@@ -99,7 +99,7 @@ export default function CreatePollForm() {
 
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded-lg shadow-md max-w-xl mx-auto">
         <div className="mb-4">
         <label htmlFor="headerImage" className="block text-sm font-medium text-gray-700 mb-1">
           Header Image (optional)

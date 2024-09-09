@@ -17,6 +17,7 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
   const [animate, setAnimate] = useState(false);
   const [voterName, setVoterName] = useState('');
   const [allowMultipleAnswers, setAllowMultipleAnswers] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     if (poll) {
@@ -71,6 +72,17 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
     } else {
       setSelectedOptions([optionId]);
     }
+  };
+
+ const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => {
+        setShowTooltip(true);
+        setTimeout(() => setShowTooltip(false), 2000); 
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+      });
   };
 
   const handleVote = async () => {
@@ -162,14 +174,22 @@ export default function VotingInterface({ pollId }: { pollId: string }) {
         >
           {hasVoted ? 'Voted' : 'Vote'}
         </button>
-        {hasVoted && (
-          <button
-            onClick={loadPoll}
-            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
-          >
-            Refresh Results
-          </button>
-        )}
+            <div className="relative">
+    <button
+      onClick={copyToClipboard}
+      className="bg-white text-gray-700 p-2 rounded border border-gray-300 hover:bg-gray-100 transition-colors flex items-center"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-purple-500" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+      </svg>
+      Share
+    </button>
+    {showTooltip && (
+      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow-lg transition-opacity duration-300">
+        Link added to clipboard!
+      </div>
+    )}
+  </div>
       </div>
       <p className="mt-2 text-center text-gray-600">Total votes: {totalVotes}</p>
     </div>
