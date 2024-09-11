@@ -127,7 +127,7 @@ export default function CreatePollForm() {
               className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
           </div>
@@ -141,7 +141,7 @@ export default function CreatePollForm() {
         )}
       </div>
       <div>
-        <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="question" className="block text-lg font-medium text-gray-700 mb-2">
           Poll Question
         </label>
         <input
@@ -149,36 +149,45 @@ export default function CreatePollForm() {
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Enter your poll question"
-          className="w-full p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+          className="w-full p-3 text-lg border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+          required
         />
       </div>
-      {options.map((option, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          <input
-            type="text"
-            value={option}
-            onChange={(e) => {
-              const newOptions = [...options];
-              newOptions[index] = e.target.value;
-              setOptions(newOptions);
-            }}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            placeholder={`Option ${index + 1}`}
-            className="flex-grow p-2 border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
-          />
-          {options.length > 2 && (
-        <button
-        type="button"
-        onClick={() => removeOption(index)}
-        className="text-gray-400 hover:text-red-500 transition-colors"
-        aria-label={`Remove option ${index + 1}`}
-      >
-        X
-      </button>
-          )}
-        </div>
-      ))}
+      <div className="space-y-4">
+        <label className="block text-lg font-medium text-gray-700">Poll Options</label>
+        {options.map((option, index) => (
+          <div key={index} className="space-y-1">
+            <label htmlFor={`option-${index}`} className="block text-base font-medium text-gray-700">
+              Option {index + 1}
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                id={`option-${index}`}
+                type="text"
+                value={option}
+                onChange={(e) => {
+                  const newOptions = [...options];
+                  newOptions[index] = e.target.value;
+                  setOptions(newOptions);
+                }}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                className="flex-grow p-3 text-lg border border-gray-300 rounded-md text-black focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              {options.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => removeOption(index)}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                  aria-label={`Remove option ${index + 1}`}
+                >
+                  X
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
       <div className="flex items-center space-x-2">
         <input
           type="checkbox"
